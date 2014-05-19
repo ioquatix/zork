@@ -24,6 +24,7 @@ class Place:
         self.name = name
         self.description = description
         self.connections = {}
+        self.actions = {}
 
     def visit(self, player):
         pass
@@ -34,7 +35,12 @@ class Place:
         if self.description:
             print(self.description)
         
-        print("Directions: {}".format(", ".join(self.connections.keys())))
+        for action in self.actions.values():
+            action.print_description()
+        
+        print()
+        print("You can go: {}".format(", ".join(self.connections.keys())))
+        print("You can do: {}".format(", ".join(self.actions.keys())))
 
     def get_connection(self, name):
         if name in self.connections:
@@ -42,6 +48,12 @@ class Place:
         else:
             return None
     
+    def get_action(self, name):
+        if name in self.actions:
+            return self.actions[name]
+        else:
+            return None
+        
     def connect(self, in_word, out_word, other_place):
         self.connections[in_word] = other_place
         if out_word:
@@ -58,10 +70,37 @@ class GruePlace(Place):
         elif random.random() > 0.5:
             print("You hear a faint rustling sound in the shadows...")
 
+class Mailbox:
+    def __init__(self):
+        self.opened = False
+        self.fire = False
+    
+    def print_description(self):
+        if self.opened:
+            print("There is a small mailbox and it is opened.")
+        elif self.fire:
+            print("There is a small fire where the mailbox used to be.")
+        else:
+            print("There is a small mailbox here.")
+    
+    def act(self, game):
+        if self.opened:
+            if random.random() > 0.97:
+                print("You try to open the mailbox, but it catches on fire!")
+                game.player.hp -= 20
+            else:
+                print("The mailbox is already open.")
+        else:
+            print("You open the mailbox and find a level up.")
+            game.player.level += 1
+            self.opened = True
+            
+
 start = Place("Outside", """
 You are standing in an open field west of a white house, with a boarded front door.
-There is a small mailbox here.
 """)
+
+start.actions["mailbox"] = Mailbox()
 
 house = start.connections["east"] = Place("White House", """
 It's white. The inside is black.

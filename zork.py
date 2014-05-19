@@ -23,12 +23,25 @@ class Game:
         
         user_input = input("> ")
         
+        if user_input == "exit":
+            self.running = False
+            return
+        
         next_location = self.location.get_connection(user_input)
         
         if next_location:
             self.location = next_location
         else:
-            print("You crash into an invisible wall, you can't go {}".format(user_input))
+            action_function = self.location.get_action(user_input)
+            
+            if action_function:
+                action_function.act(game)
+            else:
+                print("Unfortunately, {} is not a possibility!".format(user_input))
+
+        print()
+        input("Press enter to continue...")
+        print()
 
 game = Game(story.Player("Shinji"), story.start)
 
