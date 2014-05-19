@@ -11,6 +11,14 @@ class Game:
         self.running = True
     
     def once(self):
+        self.player.print_status(self)
+        
+        if self.player.hp <= 1:
+            print("You died :(")
+            self.running = False
+            return
+        
+        self.location.visit(self.player)
         self.location.print_description(self)
         
         user_input = input("> ")
