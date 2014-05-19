@@ -16,25 +16,23 @@ class Player:
         self.hp = 101
         self.level = -1
         self.inventory = {}
-        self.followerslist = {}
+        self.followers = {}
     
     def print_status(self, game):
         print(Terminal.OKGREEN + "[{} HP:{} LVL:{}]".format(self.name.ljust(20), self.hp, self.level) + Terminal.END)
 
 
-class followers:
-    def __init__(self):
-        pass
+class Followers:
     def print_description(self):
-        pass    
+        pass
     def act(self, game):
-        followerslist = game.player.followerslist
+        followers = game.player.followers
         
-        if len(followerslist) == 0:
+        if len(followers) == 0:
             print("you have no followers.....loner.....")
         else:
-            for follow in followerslist.values():
-                print("{} HP:{} LVL:{}".format(follow.flname.ljust(20), follow.flhp, follow.fllevel))
+            for follow in followers.values():
+                print("{} HP:{} LVL:{}".format(follow.name.ljust(20), follow.hp, follow.level))
                 
         return False        
 
@@ -62,9 +60,8 @@ class Place:
         self.name = name
         self.description = description
         self.connections = {}
-        self.actions = {"inventory": Bag()}
-        self.actions = {"followers": followers()}
-#############################################Line above can only show either followers or inventory, not both....someone fix this###############################################################
+        self.actions = {"inventory": Bag(), "followers": Followers()}
+
 
     def visit(self, player):
         pass
@@ -153,16 +150,16 @@ class Item:
         return True
 
 class follow:
-    def __init__(self, flname, fllevel, flhp):
-        self.flname = flname
-        self.fllevel = fllevel
-        self.flhp = flhp
+    def __init__(self, name, level, hp):
+        self.name = name
+        self.level = level
+        self.hp = hp
     def print_description(self):
-        print("You meet {}, they are level {} and have {} HP".format(self.flname, self.fllevel, self.flhp))
+        print("You meet {}, they are level {} and have {} HP".format(self.name, self.level, self.hp))
     
     def act(self, game):
-        print("{} will now follow you on your quest".format(self.flname))
-        game.player.followerslist[self.flname, self.fllevel, self.flhp] = self
+        print("{} will now follow you on your quest".format(self.name))
+        game.player.followers[self.name, self.level, self.hp] = self
         
         return True
 
