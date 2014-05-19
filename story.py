@@ -19,12 +19,28 @@ class Player:
     def print_status(self, game):
         print(Terminal.OKGREEN + "[{} HP:{} LVL:{}]".format(self.name.ljust(20), self.hp, self.level) + Terminal.END)
 
+class Bag:
+    def __init__(self):
+        pass
+    
+    def print_description(self):
+        pass
+    
+    def act(self, game):
+        inventory = game.player.inventory
+        
+        if len(inventory) == 0:
+            print("Your bag is empty.")
+        else:
+            for item in inventory.values():
+                print("You have a {}".format(item.name))
+
 class Place:
     def __init__(self, name, description = None):
         self.name = name
         self.description = description
         self.connections = {}
-        self.actions = {}
+        self.actions = {"inventory": Bag()}
 
     def visit(self, player):
         pass
@@ -39,8 +55,12 @@ class Place:
             action.print_description()
         
         print()
-        print("You can go: {}".format(", ".join(self.connections.keys())))
-        print("You can do: {}".format(", ".join(self.actions.keys())))
+        
+        if len(self.connections) > 0:
+            print("You can go: {}".format(", ".join(self.connections.keys())))
+        
+        if len(self.actions) > 0:
+            print("You can do: {}".format(", ".join(self.actions.keys())))
 
     def get_connection(self, name):
         if name in self.connections:
@@ -94,7 +114,21 @@ class Mailbox:
             print("You open the mailbox and find a level up.")
             game.player.level += 1
             self.opened = True
-            
+
+class Item:
+    def __init__(self, name):
+        self.name = name
+    
+    def print_description(self):
+        print("You see a {}".format(self.name))
+    
+    def act(self, game):
+        print("You take the {}".format(self.name))
+        game.player.inventory[self.name] = self
+    
+class RubberChicken(Item):
+    def __init__(self):
+        super().__init__("Rubber Chicken")
 
 start = Place("Outside", """
 You are standing in an open field west of a white house, with a boarded front door.
@@ -102,18 +136,22 @@ You are standing in an open field west of a white house, with a boarded front do
 
 start.actions["mailbox"] = Mailbox()
 
-house = start.connections["east"] = Place("White House", """
+house = Place("White House", """
 It's white. The inside is black.
 """)
 
-house.connections["west"] = start
+start.connect("east", "west", house)
 
-hallway = house.connections["in"] = GruePlace("Hallway", """
+hallway = GruePlace("Hallway", """
 It is pitch black.
 """)
+
+house.connect("in", "out", hallway)
 
 kitchen = Place("Kitchen")
 hallway.connect("left", "back", kitchen)
 
 pool = Place("In-door Swimming Pool")
+pool.actions["inspect"] = RubberChicken()
+
 hallway.connect("right", "back", pool)

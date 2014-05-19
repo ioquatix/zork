@@ -31,6 +31,7 @@ class Game:
         
         if next_location:
             self.location = next_location
+            print("You travel {} to the {}".format(user_input, self.location.name))
         else:
             action_function = self.location.get_action(user_input)
             
@@ -43,7 +44,9 @@ class Game:
         input("Press enter to continue...")
         print()
 
-game = Game(story.Player("Shinji"), story.start)
+name = input("What is your name, humble adventurer? ")
+
+game = Game(story.Player(name), story.start)
 
 while game.running:
     game.once()
