@@ -11,6 +11,8 @@ class Game:
         self.running = True
     
     def once(self):
+        print(story.Terminal.CLR)
+        
         self.player.print_status(self)
         
         if self.player.hp <= 1:
@@ -36,7 +38,8 @@ class Game:
             action_function = self.location.get_action(user_input)
             
             if action_function:
-                action_function.act(game)
+                if action_function.act(game):
+                    self.location.actions.pop(user_input)
             else:
                 print("Unfortunately, {} is not a possibility!".format(user_input))
 

@@ -8,6 +8,7 @@ class Terminal:
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     END = '\033[0m'
+    CLR = chr(27) + "[2J"
 
 class Player:
     def __init__(self, name):
@@ -34,6 +35,8 @@ class Bag:
         else:
             for item in inventory.values():
                 print("You have a {}".format(item.name))
+        
+        return False
 
 class Place:
     def __init__(self, name, description = None):
@@ -105,7 +108,7 @@ class Mailbox:
     
     def act(self, game):
         if self.opened:
-            if random.random() > 0.97:
+            if random.random() > 0.30:
                 print("You try to open the mailbox, but it catches on fire!")
                 game.player.hp -= 20
             else:
@@ -125,6 +128,8 @@ class Item:
     def act(self, game):
         print("You take the {}".format(self.name))
         game.player.inventory[self.name] = self
+        
+        return True
     
 class RubberChicken(Item):
     def __init__(self):
