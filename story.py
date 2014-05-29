@@ -16,9 +16,26 @@ class Player:
         self.hp = 101
         self.level = -1
         self.inventory = {}
+        self.followers = {}
     
     def print_status(self, game):
         print(Terminal.OKGREEN + "[{} HP:{} LVL:{}]".format(self.name.ljust(20), self.hp, self.level) + Terminal.END)
+
+
+class Followers:
+    def print_description(self):
+        pass
+    def act(self, game):
+        followers = game.player.followers
+        
+        if len(followers) == 0:
+            print("you have no followers.....loner.....")
+        else:
+            for follow in followers.values():
+                print("{} HP:{} LVL:{}".format(follow.name.ljust(20), follow.hp, follow.level))
+                
+        return False        
+
 
 class Bag:
     def __init__(self):
@@ -43,7 +60,8 @@ class Place:
         self.name = name
         self.description = description
         self.connections = {}
-        self.actions = {"inventory": Bag()}
+        self.actions = {"inventory": Bag(), "followers": Followers()}
+
 
     def visit(self, player):
         pass
@@ -90,7 +108,7 @@ class GruePlace(Place):
         elif random.random() > 0.95:
             print("You have been attacked by a Grue.")
             player.hp -= 5
-        elif random.random() > 0.5:
+        elif random.random() > 0.1:
             print("You hear a faint rustling sound in the shadows...")
 
 class Mailbox:
@@ -130,15 +148,32 @@ class Item:
         game.player.inventory[self.name] = self
         
         return True
+
+class follow:
+    def __init__(self, name, level, hp):
+        self.name = name
+        self.level = level
+        self.hp = hp
+    def print_description(self):
+        print("You meet {}, they are level {} and have {} HP".format(self.name, self.level, self.hp))
     
+    def act(self, game):
+        print("{} will now follow you on your quest".format(self.name))
+        game.player.followers[self.name, self.level, self.hp] = self
+        
+        return True
+
 class RubberChicken(Item):
     def __init__(self):
         super().__init__("Rubber Chicken")
 
+class MrCat(follow):
+    def __init__(self):
+        super().__init__("Mr.Cat", "2", "2")
+
 start = Place("Outside", """
 You are standing in an open field west of a white house, with a boarded front door.
 """)
-
 start.actions["mailbox"] = Mailbox()
 
 house = Place("White House", """
@@ -154,6 +189,7 @@ It is pitch black.
 house.connect("in", "out", hallway)
 
 kitchen = Place("Kitchen")
+kitchen.actions["recruit"] = MrCat()
 hallway.connect("left", "back", kitchen)
 
 pool = Place("In-door Swimming Pool")
